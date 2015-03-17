@@ -9,6 +9,10 @@ module Interpol
       ForSchemaDefinition.new(schema).to_html
     end
 
+    def html_for_examples(examples)
+      ForSchemaExamples.new(examples).to_html
+    end
+
     # Renders the documentation for a schema definition.
     class ForSchemaDefinition
       def initialize(schema)
@@ -83,7 +87,48 @@ module Interpol
 
       def property_title(name, property)
         return name unless property['type']
-        "#{name} (#{property['type']})"
+        "#{name} : #{property['type']}"
+      end
+    end
+
+    # Renders the examples for a schema definition.
+    class ForSchemaExamples
+      def initialize(examples)
+        @examples = examples
+      end
+
+      def to_html
+        build do |doc|
+          render_schema_examples(doc, @examples)
+        end.to_html
+      end
+
+    private
+
+      def build
+        Nokogiri::HTML::DocumentFragment.parse("").tap do |doc|
+          Nokogiri::HTML::Builder.with(doc) do |doc|
+            yield doc
+          end
+        end
+      end
+
+      def render_schema_examples(doc, examples)
+        return if examples.empty?
+
+        doc.h3 { doc.text("Examples:") }
+        doc.div(:class => "schema-examples") do
+          examples.each do |example|
+            render_schema_example(doc, example)
+          end
+        end
+      end
+
+      def render_schema_example(doc, example)
+        doc.pre(:class => "schema-example") do
+          doc.text(JSON.pretty_generate(example.data))
+          #doc.text(example.data.to_s)
+        end
       end
     end
   end

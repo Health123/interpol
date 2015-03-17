@@ -9,6 +9,8 @@
         <h3><%= definition.message_type.capitalize %> - Version <%= definition.version %> - <%= definition.status_codes %></h3>
         <br/>
         <%= Interpol::Documentation.html_for_schema(definition.schema) %>
+        <br/>
+        <%= Interpol::Documentation.html_for_examples(definition.examples) %>
       </div>
       <hr/>
     <% end %>
