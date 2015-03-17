@@ -69,7 +69,7 @@ module Interpol
   # based on the endpoint definitions in the YAML files.
   class Endpoint
     include HashFetcher
-    attr_reader :name, :route, :method, :custom_metadata, :configuration
+    attr_reader :name, :route, :method, :custom_metadata, :configuration, :description
 
     def initialize(endpoint_hash, configuration = Interpol.default_configuration)
       @name        = fetch_from(endpoint_hash, 'name')
@@ -78,6 +78,8 @@ module Interpol
 
       @configuration   = configuration
       @custom_metadata = endpoint_hash.fetch('meta') { {} }
+
+      @description = endpoint_hash.fetch('description') { "" }
 
       @definitions_hash, @all_definitions = extract_definitions_from(endpoint_hash)
 

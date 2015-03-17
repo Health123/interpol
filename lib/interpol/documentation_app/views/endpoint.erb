@@ -2,6 +2,7 @@
   <div class="hero-unit">
     <h1><%= endpoint.name %></h1>
     <h2><%= endpoint.method.to_s.upcase %> <%= endpoint.route %></h2>
+    <p><%= endpoint.description %></p>
 
     <% endpoint.definitions.each do |definition| %>
       <div class="versioned-endpoint-definition">
