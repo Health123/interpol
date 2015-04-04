@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'redcarpet'
 
 module Interpol
   # Renders HTML documentation for an interpol endpoint.
@@ -6,23 +7,46 @@ module Interpol
     extend self
 
     def html_for_schema(schema)
-      ForSchemaDefinition.new(schema).to_html
+      SchemaDefinitionRenderer.new(schema).to_html
     end
 
     def html_for_examples(examples)
-      ForSchemaExamples.new(examples).to_html
+      SchemaExamplesRenderer.new(examples).to_html
     end
 
-    # Renders the documentation for a schema definition.
-    class ForSchemaDefinition
-      def initialize(schema)
-        @schema = schema
+    def redcarpet
+      @redcarpet ||= Redcarpet::Markdown.new \
+        Redcarpet::Render::HTML,
+        no_intra_emphasis: true,
+        tables: true,
+        fenced_code_blocks: true,
+        disable_indented_code_blocks: true,
+        strikethrough: true,
+        lax_spacing: true,
+        superscript: true,
+        underline: true,
+        highlight: true,
+        quote: true
+    end
+
+    class Renderer
+      def initialize(document)
+        @document = document
       end
 
       def to_html
         build do |doc|
-          schema_definition(doc, @schema)
+          render(doc, @document)
         end.to_html
+      end
+
+      def render_markdown(md)
+        Interpol::Documentation.redcarpet.render(md)
+      end
+
+      def render_fragment(md)
+        # strip enclosing <p> tags
+        render_markdown(md)[3..-4]
       end
 
     private
@@ -34,6 +58,19 @@ module Interpol
           end
         end
       end
+    end
+
+    # Renders the documentation for a schema definition.
+    class SchemaDefinitionRenderer < Renderer
+
+    private
+
+      def render(doc, schema)
+        doc.div(:class => "schema-definition") do
+          schema_description(doc, schema)
+          render_properties_and_items(doc, schema)
+        end
+      end
 
       def schema_description(doc, schema)
         return unless schema.has_key?('description')
@@ -43,13 +80,6 @@ module Interpol
       def render_properties_and_items(doc, schema)
         render_properties(doc, Array(schema['properties']))
         render_items(doc, schema['items'])
-      end
-
-      def schema_definition(doc, schema)
-        doc.div(:class => "schema-definition") do
-          schema_description(doc, schema)
-          render_properties_and_items(doc, schema)
-        end
       end
 
       def render_items(doc, items)
@@ -76,7 +106,7 @@ module Interpol
       end
 
       def property_definition(doc, name, property)
-        doc.dt(:class => "name") { doc.text(property_title name, property) }  if name
+        doc.dt(:class => "name"){ doc << property_title(name, property) } if name
 
         if property.has_key?('description')
           doc.dd { doc.text(property['description']) }
@@ -87,33 +117,16 @@ module Interpol
 
       def property_title(name, property)
         return name unless property['type']
-        "#{name} : #{property['type']}"
+        render_fragment("**#{name}**  *#{property['type']}*")
       end
     end
 
     # Renders the examples for a schema definition.
-    class ForSchemaExamples
-      def initialize(examples)
-        @examples = examples
-      end
-
-      def to_html
-        build do |doc|
-          render_schema_examples(doc, @examples)
-        end.to_html
-      end
+    class SchemaExamplesRenderer < Renderer
 
     private
 
-      def build
-        Nokogiri::HTML::DocumentFragment.parse("").tap do |doc|
-          Nokogiri::HTML::Builder.with(doc) do |doc|
-            yield doc
-          end
-        end
-      end
-
-      def render_schema_examples(doc, examples)
+      def render(doc, examples)
         return if examples.empty?
 
         doc.h3 { doc.text("Examples:") }
@@ -133,4 +146,3 @@ module Interpol
     end
   end
 end
-

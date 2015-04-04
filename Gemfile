@@ -18,3 +18,4 @@ gem 'cane', '~> 2.6'
 # 1.6 won't install on JRuby or 1.8.7 :(.
 gem 'nokogiri', '~> 1.5.10'
 
+gem 'redcarpet'

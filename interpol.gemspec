@@ -20,6 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'rack'
   gem.add_dependency 'json-schema', '~> 2.2.5'
   gem.add_dependency 'hashie', '~> 1.2'
+  gem.add_dependency 'redcarpet'
 
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'simplecov', '~> 0.6'
