@@ -19,6 +19,7 @@ if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby' # MRI only
     cane.abc_exclude = %w[
       Interpol::StubApp::Builder#initialize
       Interpol::EndpointDefinition#initialize
+      Interpol::Endpoint#initialize
     ]
 
     cane.style_exclude = %w[

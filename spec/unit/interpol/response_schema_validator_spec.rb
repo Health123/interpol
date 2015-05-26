@@ -137,7 +137,7 @@ module Interpol
       expect(yielded_args[0]).to have_key('rack.version') # env hash
       expect(yielded_args[1]).to eq(200) # status
       expect(yielded_args[2]).to have_key('Content-Type') # headers
-      expect(yielded_args[3]).to eq([%|{"a":"b"}|]) # body
+      expect(yielded_args[3].to_a).to eq([%|{"a":"b"}|]) # body
     end
 
     it 'does not validate if the validate_response_if config returns false' do
