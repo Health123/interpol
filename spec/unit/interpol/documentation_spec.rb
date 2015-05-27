@@ -60,21 +60,23 @@ module Interpol
       end
 
       it 'renders properties' do
-        expect(parsed_html.css("#{root_properties_dom} > .name").map(&:content)).to match_array [
-          "first_name (string)",
-          "last_name (string)",
-          "date_of_birth (date)",
-          "gender (string)",
-          "address (object)"
+        properties = parsed_html.css("#{root_properties_dom} > .name").map(&:content).map(&:strip)
+        expect(properties).to match_array [
+          "first_name  string",
+          "last_name  string",
+          "date_of_birth  date",
+          "gender  string",
+          "address  object"
         ]
       end
 
       it 'renders nested properties' do
-        expect(parsed_html.css('.properties .properties .name').map(&:content)).to match_array [
-          "street (string)",
-          "city (string)",
-          "state (string)",
-          "zip (string)"
+        properties = parsed_html.css('.properties .properties .name').map(&:content).map(&:strip)
+        expect(properties).to match_array [
+          "street  string",
+          "city  string",
+          "state  string",
+          "zip  string"
         ]
       end
     end

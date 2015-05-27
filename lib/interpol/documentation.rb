@@ -29,6 +29,7 @@ module Interpol
         quote: true
     end
 
+    # Inner class for rendering the markdown
     class Renderer
       def initialize(document)
         @document = document
